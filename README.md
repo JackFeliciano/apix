@@ -1,9 +1,20 @@
 # APIX
 
-APIX is the set of layers that most HTTP products rebuild from nothing: identity,
-permissions, tenancy, a ledger, events, files, and one response shape. A product joins APIX by declaring a manifest. The runtime
-reads the manifest, enforces what it says, and refuses anything the manifest does
-not name.
+APIX is a declarative, manifest-governed runtime for HTTP applications. A product
+declares a manifest, the runtime reads it, and the runtime enforces what it says.
+Each module then gets identity, permissions, tenancy, a ledger, events, files and
+one response shape from the runtime, and holds no application-level dependency on
+its neighbours.
+
+The manifest is the centre of the design. It carries the module's name, its
+version, every route with the permission that route needs, and the events the
+module publishes. A route the manifest does not name never serves, and a route that
+declares no permission never joins, so the boundary is a contract the module
+signs rather than a habit its author keeps.
+
+These layers are ordinary. Every HTTP product needs them, and most products build
+them again, each with its own architecture, its own security assumptions and its
+own conventions.
 
 Two modules ship with the repository as working samples. One is a shop and one
 reads the ledger. Neither imports the other.
