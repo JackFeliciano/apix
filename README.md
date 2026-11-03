@@ -1,8 +1,7 @@
 # APIX
 
-APIX is the set of layers that every product in this ecosystem needs and none of
-them should write twice: identity, permissions, tenancy, a ledger, events, files,
-and one response shape. A product joins APIX by declaring a manifest. The runtime
+APIX is the set of layers that most HTTP products rebuild from nothing: identity,
+permissions, tenancy, a ledger, events, files, and one response shape. A product joins APIX by declaring a manifest. The runtime
 reads the manifest, enforces what it says, and refuses anything the manifest does
 not name.
 
@@ -22,7 +21,7 @@ reads the ledger. Neither imports the other.
     connectors/         the connector kit: a JSON reader and a database adapter
     modules/fake_shop/  a sample module that sells a product and posts to the ledger
     modules/fake_ledger/ a sample module that reads the ledger
-    conformance/run.js  the kit that proves a module honours all six layers
+    conformance/run.js  the kit that proves a module honours every layer
     conformance/connectors.js  the connector kit against one fake company
 
 ## Run it
@@ -63,7 +62,7 @@ Failure:
      "meta":{"request_id":"req_...","at":"..."}}
 
 The request id rides in the `x-request-id` header as well, so a client can quote
-it and an operator can find the line.
+it and support can find the line.
 
 ## A module
 
@@ -96,7 +95,7 @@ so a route cannot forget it.
     npm test
 
 Both run offline against a temporary directory. They mount the sample modules on
-a real server, drive real HTTP requests at it, and check ten things: an anonymous
+a real server, drive real HTTP requests at it, and check every rule: an anonymous
 call is refused, an expired token is refused, a token without the declared
 permission is refused, every answer carries a request id and the shape, a row
 written by one tenant never appears in another tenant's list, the store refuses a
@@ -132,8 +131,9 @@ repository holds no key, no host and no client address. `APIX_SECRET` signs the
 tokens and needs at least 16 characters. `APIX_CORS` lists the browser origins
 allowed to call the API cross-origin, and an empty list allows nobody.
 
-The sample secret in `src/server.js` exists so a first run works without
-configuration. Set `APIX_SECRET` before anything real touches it.
+`src/server.js` falls back to a development secret so a first run works without
+configuration. Set `APIX_SECRET` before anything real touches it, and set it in
+production, because the fallback signs a token anyone can forge.
 
 ## What this is not
 
