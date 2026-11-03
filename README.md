@@ -88,6 +88,26 @@ the context comes from the token, never from the body. `ctx.store.list` and
 `ctx.store.get` take the tenant as their second argument and throw without it,
 so a route cannot forget it.
 
+## See it work
+
+    npm run demo
+
+Open `http://127.0.0.1:8091/` and the page shows each layer with two buttons. One
+button makes a call the layer allows, and the other makes the call it refuses. The
+page talks to the same server process over HTTP, so every answer on screen came
+from the code in `src/`.
+
+The demo mounts `modules/showroom/`, whose routes carry no business meaning. Each
+route exists to demonstrate one rule, and the page names the rule beside the
+answer it produced.
+
+The demo mints the tokens on that page with a fixed secret, so they are public.
+The demo server binds to the loopback address, and its own page says so. A real
+deployment signs with a secret it holds.
+
+The showroom is also covered by the suite: `conformance/showroom.js` starts the
+demo on a spare port and drives every button over real HTTP.
+
 ## The conformance kit
 
     node conformance/run.js

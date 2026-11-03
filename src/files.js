@@ -11,14 +11,15 @@ export class FileStore {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  put(tenant, name, bytes, contentType = 'application/octet-stream') {
+  put(tenant, bytes, name = 'file', contentType = 'application/octet-stream') {
     requireTenant(tenant);
     const buf = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
     const hash = crypto.createHash('sha256').update(buf).digest('hex');
     const tenantDir = path.join(this.dir, tenant);
     fs.mkdirSync(tenantDir, { recursive: true });
     const full = path.join(tenantDir, hash);
-    if (!fs.existsSync(full)) fs.writeFileSync(full, buf);
+    const already = fs.existsSync(full);
+    if (!already) fs.writeFileSync(full, buf);
     return {
       tenant,
       name,
@@ -26,7 +27,7 @@ export class FileStore {
       size: buf.length,
       content_type: contentType,
       url: `/files/${tenant}/${hash}`,
-      deduplicated: fs.existsSync(full),
+      deduplicated: already,
     };
   }
 

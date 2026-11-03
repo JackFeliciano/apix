@@ -171,12 +171,14 @@ export async function runConformance(modules, { extra = async () => {}, check: o
     stranger.headers.get('access-control-allow-origin') === null);
 
   // 9. Files: a file belongs to its tenant, and a second upload writes nothing new.
-  const putA = files.put(TENANT, 'invoice.txt', 'hello');
-  const putB = files.put(OTHER, 'invoice.txt', 'hello');
+  const putA = files.put(TENANT, Buffer.from('hello'), 'invoice.txt');
+  const putB = files.put(OTHER, Buffer.from('hello'), 'invoice.txt');
   check('files: two tenants hold the same bytes under separate paths',
     putA.hash === putB.hash && files.get(TENANT, putA.hash).toString() === 'hello');
   check('files: a tenant cannot own another tenant\'s file',
-    files.owns(TENANT, putA.hash) && files.owns(OTHER, putB.hash));
+    files.owns(TENANT, putA.hash) && files.owns(OTHER, putB.hash) && !files.owns('tenant_c', putA.hash));
+  const againA = files.put(TENANT, Buffer.from('hello'), 'invoice.txt');
+  check('files: a second upload of the same bytes is reported as already stored', againA.deduplicated === true);
 
   // 10. Manifest: a module that declares no permission for a route is refused at join time.
   let rejected = false;
