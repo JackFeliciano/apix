@@ -62,7 +62,7 @@ function servePage(res, runtime) {
   res.end(injected);
 }
 
-export function start(port = Number(process.env.APIX_DEMO_PORT ?? 8090)) {
+export function start(port = Number(process.env.APIX_DEMO_PORT ?? 8091)) {
   const runtime = buildDemo();
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, 'http://localhost');
