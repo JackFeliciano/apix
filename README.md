@@ -1,10 +1,14 @@
 # APIX
 
-APIX is a declarative, manifest-governed runtime for HTTP applications. A product
-declares a manifest, the runtime reads it, and the runtime enforces what it says.
-Each module then gets identity, permissions, tenancy, a ledger, events, files and
-one response shape from the runtime, and holds no application-level dependency on
-its neighbours.
+APIX is API-X, the extended API. A plain API answers questions about the resources
+a product owns. API-X also answers who is asking, what they may do, which tenant the
+request belongs to, what the change did to an account, what should react to it, and
+which file it touched, and it answers all of that in one response shape.
+
+The runtime carries those layers. A product declares a manifest, the runtime reads
+it, and the runtime enforces what it says. Each module then gets identity,
+permissions, tenancy, a ledger, events, files and one response shape from the
+runtime, and holds no application-level dependency on its neighbours.
 
 The manifest is the centre of the design. It carries the module's name, its
 version, every route with the permission that route needs, and the events the
