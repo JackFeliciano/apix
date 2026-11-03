@@ -23,6 +23,24 @@ own conventions.
 Two modules ship with the repository as working samples. One is a shop and one
 reads the ledger. Neither imports the other.
 
+## The seven questions
+
+Every HTTP product answers the same seven questions, and most answer them again
+from nothing, each with its own architecture, its own security assumptions and its
+own conventions. API-X answers them once, below the product.
+
+    Layer            The question it answers
+    Identity         Who is making the request?
+    Permissions      What is that identity allowed to do?
+    Tenancy          Which account or environment does the request belong to?
+    Ledger           What accountable change did this request make?
+    Events           What happened, and what should react to it?
+    Files            How does the product keep documents and other binary assets?
+    Response shape   How does the API report a result or an error, consistently?
+
+None of the seven is unusual. The cost sits in rebuilding them, and in the drift
+between one product's answer and the next.
+
 ## What is here
 
     src/token.js        signed tokens, HS256, no dependencies
