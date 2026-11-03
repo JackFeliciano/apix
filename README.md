@@ -64,6 +64,49 @@ Failure:
 The request id rides in the `x-request-id` header as well, so a client can quote
 it and support can find the line.
 
+## Questions a reader asks first
+
+Six questions decide whether this design holds. The answers below describe the
+code in this repository, and you can check each one in the file named.
+
+**How far does the manifest go?** It declares routes. Each route carries a method,
+a path, the permission it needs and a handler. It also declares the module's name,
+its version, the permission names it uses and the events it publishes. Route and
+permission are the unit of enforcement, so a module can hold many routes and
+give each one its own permission. See `src/manifest.js`.
+
+**Who enforces?** The runtime. It verifies the token, compares the permission the
+route declares against the claim set in the token, and only then calls the handler.
+A module author writes no check, and a handler that forgot one cannot leak, because
+the runtime never handed it the request. See `src/runtime.js`.
+
+**What does the ledger hold?** Postings, each with a debit account, a credit
+account, an integer amount in minor units, a reference and an idempotency key. To
+read a balance the ledger sums the postings for an account. The ledger refuses a
+negative or fractional amount, and it refuses a posting where debit and credit name
+the same account. Post twice with one key and the second call returns the first
+posting. See `src/ledger.js`.
+
+**How does tenancy work?** The tenant comes from the token and rides in the request
+context. Every store call takes the tenant as its second argument and throws
+without one, so a route cannot forget it. The default store keeps one JSON file per
+collection and filters on the tenant field. Isolation between databases belongs to
+the adapter you pass to `dbConnector`, so a product that needs a schema or a
+database per tenant supplies one that does that. See `src/store.js` and
+`connectors/index.js`.
+
+**Can someone else write a module?** Yes. A module is an object from
+`defineModule`, and the runtime takes a list of them. Nothing marks a module as
+first party. The conformance kit is the review: a module author runs it against
+their own module on their own machine, and it passes or it does not.
+
+**How isolated are modules?** They share one Node process and one file system. A
+handler receives the store, the ledger, the bus and the file store, and it can call
+the ones its module was given. A module that imports the runtime's internals
+directly can reach past that, so the boundary is a convention the conformance kit
+does not test. Running a module in its own process would close that gap, and this
+repository does not do it yet.
+
 ## A module
 
     import { defineModule } from '../../src/manifest.js';
