@@ -5,3 +5,7 @@ node_modules/
 *.log
 
 .data-live/
+
+.smoke/
+*.bundle
+apix-demo-*/

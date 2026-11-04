@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APIX showroom</title>
+<style>
+  :root {
+    --paper: #f7f6f2;
+    --ink: #1c1c1a;
+    --dim: #6b6a63;
+    --rule: #ddd9cf;
+    --ok: #1f6b46;
+    --no: #9b2f2a;
+    --accent: #2d4a86;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.55 Georgia, "Times New Roman", serif;
+  }
+  header {
+    padding: 28px 32px 18px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 24px; letter-spacing: 0.02em; }
+  header p { margin: 0; color: var(--dim); font-size: 13px; max-width: 62ch; }
+  main { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 90px); }
+  aside {
+    border-right: 1px solid var(--rule);
+    padding: 22px 24px;
+  }
+  aside h2, section h2 {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin: 0 0 10px;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  .who { margin-bottom: 26px; }
+  .who button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 8px;
+    padding: 9px 12px;
+    border: 1px solid var(--rule);
+    background: #fff;
+    border-radius: 4px;
+    font: inherit;
+    cursor: pointer;
+  }
+  .who button.on { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+  .who button small { display: block; color: var(--dim); font-size: 12px; }
+  .claim {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 11.5px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 8px;
+    word-break: break-word;
+    color: var(--dim);
+  }
+  field {
+    display: block;
+    margin-bottom: 14px;
+  }
+  input[type=text], input[type=number] {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font: inherit;
+    background: #fff;
+  }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .acts button {
+    padding: 8px 12px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    font: 13px/1 "Helvetica Neue", Arial, sans-serif;
+    cursor: pointer;
+  }
+  .acts button.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+  .acts button:disabled { opacity: 0.45; cursor: default; }
+  section { padding: 22px 28px; border-bottom: 1px solid var(--rule); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  pre {
+    margin: 0;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow: auto;
+    max-height: 320px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .verdict { font-size: 13px; margin: 0 0 8px; color: var(--dim); }
+  .verdict b { color: var(--ink); }
+  .pass { color: var(--ok); font-weight: bold; }
+  .blocked { color: var(--no); font-weight: bold; }
+  ul.events { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  ul.events li {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  ul.events li span.topic { color: var(--accent); }
+  ul.events li span.at { color: var(--dim); margin-left: auto; font-size: 12px; }
+  footer { padding: 20px 32px 40px; color: var(--dim); font-size: 12px; max-width: 90ch; }
+  @media (max-width: 820px) {
+    main { grid-template-columns: 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .pair { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>APIX showroom</h1>
+  <p>Every button here calls a live server on this machine. Each pair shows the same route answering twice, once for a caller who is entitled and once for one who is not.</p>
+</header>
+
+<main>
+  <aside>
+    <div class="who">
+      <h2>The caller</h2>
+      <div id="callers"></div>
+    </div>
+    <div class="claim" id="claim"></div>
+    <div class="acts">
+      <button class="ghost" id="clear">Clear every answer</button>
+    </div>
+  </aside>
+
+  <div>
+    <section>
+      <h2>Identity</h2>
+      <p class="verdict" id="v-identity"></p>
+      <div class="pair">
+        <div><pre id="no-token">(press the button)</pre></div>
+        <div><pre id="with-token">(press the button)</pre></div>
+      </div>
+      <div class="acts" style="margin-top:12px">
+        <button data-act="identity-no">Call with no token</button>
+        <button data-act="identity-yes">Call with a token</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Permission</h2>
+      <p class="verdict" id="v-permission"></p>
+      <div class="pair">
+        <div><pre id="read-only">(press the button)</pre></div>
+        <div><pre id="full">(press the button)</pre></div>
+      </div>
+      <div class="acts" style="margin-top:12px">
+        <button data-act="perm-read">Write with a read-only token</button>
+        <button data-act="perm-write">Write with a full token</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tenancy</h2>
+      <p class="verdict" id="v-tenancy"></p>
+      <div class="pair">
+        <div><pre id="tenant-a">(press the button)</pre></div>
+        <div><pre id="tenant-b">(press the button)</pre></div>
+      </div>
+      <div class="acts" style="margin-top:12px">
+        <button data-act="tenancy">Write one item per tenant, then list both</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Money</h2>
+      <p class="verdict" id="v-money"></p>
+      <div class="pair">
+        <div><pre id="key-first">(press the button)</pre></div>
+        <div><pre id="key-again">(press the button)</pre></div>
+      </div>
+      <div class="acts" style="margin-top:12px">
+        <button data-act="money">Post the same key twice, then read the balance</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Events</h2>
+      <p class="verdict" id="v-events"></p>
+      <ul class="events" id="events"><li>(nothing yet)</li></ul>
+    </section>
+
+    <section>
+      <h2>Files</h2>
+      <p class="verdict" id="v-files"></p>
+      <div class="pair">
+        <div><pre id="file-put">(press the button)</pre></div>
+        <div><pre id="file-again">(press the button)</pre></div>
+      </div>
+      <div class="acts" style="margin-top:12px">
+        <button data-act="files">Upload the same bytes twice</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>The envelope</h2>
+      <p class="verdict" id="v-envelope"></p>
+      <pre id="envelope">(press the button)</pre>
+      <div class="acts" style="margin-top:12px">
+        <button data-act="envelope">Call a route that does not exist</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  The tokens on this page are minted by this server when the page loads, they last one minute, and they carry only the permissions the buttons need. The secret that signs them stays on the server.
+</footer>
+
+<script>
+const seed = __DEMO_SEED__;
+let caller = seed.tenants[0];
+
+const el = (id) => document.getElementById(id);
+
+function paintCallers() {
+  const box = el('callers');
+  box.innerHTML = '';
+  for (const tenant of seed.tenants) {
+    const button = document.createElement('button');
+    button.className = tenant === caller ? 'on' : '';
+    button.innerHTML = `${tenant}<small>tenant ${tenant}</small>`;
+    button.onclick = () => {
+      caller = tenant;
+      paintCallers();
+      paintClaim();
+    };
+    box.appendChild(button);
+  }
+}
+
+function paintClaim() {
+  el('claim').textContent = `authorization: Bearer ${seed.tokens[caller]}`;
+}
+
+function show(id, value) {
+  el(id).textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+}
+
+function verdict(id, html) {
+  el(id).innerHTML = html;
+}
+
+async function call(path, { method = 'GET', token = null, body = null } = {}) {
+  const headers = {};
+  if (token) headers.authorization = `Bearer ${token}`;
+  if (body) headers['content-type'] = 'application/json';
+  const res = await fetch(path, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  let parsed;
+  try { parsed = JSON.parse(text); } catch { parsed = text; }
+  return { status: res.status, requestId: res.headers.get('x-request-id'), body: parsed };
+}
+
+const full = () => seed.tokens[caller];
+const readOnly = () => seed.readOnly[caller];
+
+async function identityNo() {
+  const r = await call('/v1/show/whoami');
+  show('no-token', `HTTP ${r.status}\n\n${JSON.stringify(r.body, null, 2)}`);
+  verdict('v-identity', r.status === 401
+    ? 'Left: the server refused the call before any handler ran. The runtime verifies the token, so a module never sees a caller it does not trust.'
+    : 'Left: no refusal. Something is wrong.');
+}
+
+async function identityYes() {
+  const r = await call('/v1/show/whoami', { token: full() });
+  show('with-token', `HTTP ${r.status}\n\n${JSON.stringify(r.body, null, 2)}`);
+  verdict('v-identity', r.status === 200
+    ? 'Right: the handler read the subject, the tenant and the permissions from the token alone.'
+    : 'Right: the call did not succeed.');
+}
+
+async function permRead() {
+  const r = await call('/v1/show/items', {
+    method: 'POST',
+    token: readOnly(),
+    body: { label: 'refused' },
+  });
+  show('read-only', `HTTP ${r.status}\n\n${JSON.stringify(r.body, null, 2)}`);
+  verdict('v-permission', r.status === 403
+    ? 'Left: the route declares show.write and this token carries show.read. The runtime stopped it.'
+    : 'Left: the write went through on a read-only token.');
+}
+
+async function permWrite() {
+  const r = await call('/v1/show/items', {
+    method: 'POST',
+    token: full(),
+    body: { label: 'accepted' },
+  });
+  show('full', `HTTP ${r.status}\n\n${JSON.stringify(r.body, null, 2)}`);
+  verdict('v-permission', r.status === 200
+    ? 'Right: the same route, the same server, one permission apart.'
+    : 'Right: the write did not succeed.');
+}
+
+async function tenancy() {
+  const a = await call('/v1/show/items', { method: 'POST', token: seed.tokens.acme, body: { label: 'belongs to acme' } });
+  const b = await call('/v1/show/items', { method: 'POST', token: seed.tokens.globex, body: { label: 'belongs to globex' } });
+  const listA = await call('/v1/show/items', { token: seed.tokens.acme });
+  const listB = await call('/v1/show/items', { token: seed.tokens.globex });
+  show('tenant-a', `acme wrote: ${a.status}\nacme sees:\n${JSON.stringify(listA.body, null, 2)}`);
+  show('tenant-b', `globex wrote: ${b.status}\nglobex sees:\n${JSON.stringify(listB.body, null, 2)}`);
+  const labelsA = (listA.body.data?.items ?? []).map((i) => i.label);
+  const clean = a.status === 200 && b.status === 200
+    && labelsA.includes('belongs to acme')
+    && !labelsA.includes('belongs to globex');
+  verdict('v-tenancy', clean
+    ? 'Both rows sit in one collection on disk. The token decides which of them each caller sees, and no route can ask for the other.'
+    : 'The two lists are not cleanly separated.');
+  await paintEvents();
+}
+
+async function money() {
+  const key = `demo-key-${caller}`;
+  const first = await call('/v1/show/move', { method: 'POST', token: seed.tokens[caller], body: { amount: 2500, key } });
+  const again = await call('/v1/show/move', { method: 'POST', token: seed.tokens[caller], body: { amount: 2500, key } });
+  const balance = await call('/v1/show/balance/cash', { token: seed.tokens[caller] });
+  show('key-first', `HTTP ${first.status}\n\n${JSON.stringify(first.body, null, 2)}`);
+  show('key-again', `HTTP ${again.status}\n\nsame key again\n\n${JSON.stringify(again.body, null, 2)}\n\ncash balance now: ${balance.body.data?.balance}`);
+  verdict('v-money', again.body.data?.duplicate === true
+    ? 'The second call carried the same idempotency key, so the ledger returned the first posting and the balance moved once.'
+    : 'The second call did not report a duplicate.');
+  await paintEvents();
+}
+
+async function files() {
+  const put1 = await call('/v1/show/files', {
+    method: 'POST',
+    token: seed.tokens[caller],
+    body: { text: 'the same bytes every time', name: 'note.txt' },
+  });
+  const put2 = await call('/v1/show/files', {
+    method: 'POST',
+    token: seed.tokens[caller],
+    body: { text: 'the same bytes every time', name: 'note.txt' },
+  });
+  show('file-put', `HTTP ${put1.status}\n\n${JSON.stringify(put1.body, null, 2)}`);
+  show('file-again', `HTTP ${put2.status}\n\n${JSON.stringify(put2.body, null, 2)}`);
+  const h1 = put1.body.data?.hash;
+  const h2 = put2.body.data?.hash;
+  verdict('v-files', h1 && h1 === h2
+    ? 'The file is addressed by the hash of its bytes. A second upload of the same content lands on the same address, so the store writes one file and the second answer says the content was already there.'
+    : 'The two uploads did not share a hash.');
+}
+
+async function envelope() {
+  const r = await call('/v1/show/nothing-here', { token: seed.tokens[caller] });
+  show('envelope', `HTTP ${r.status}\nx-request-id: ${r.requestId}\n\n${JSON.stringify(r.body, null, 2)}`);
+  verdict('v-envelope', 'An answer that carries a request id and a code, whether the call succeeded or not. Quote the id and the operator finds the line.');
+}
+
+async function paintEvents() {
+  const res = await fetch(`/demo/events?tenant=${encodeURIComponent(caller)}`);
+  const data = await res.json();
+  const list = el('events');
+  list.innerHTML = '';
+  if (!data.data.events.length) {
+    list.innerHTML = '<li>(nothing yet for this tenant)</li>';
+    return;
+  }
+  for (const event of data.data.events) {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="topic">${event.topic}</span> ${JSON.stringify(event.payload)}<span class="at">${event.at}</span>`;
+    list.appendChild(li);
+  }
+  verdict('v-events', `Every event the bus carried for ${caller}. Publish an item or move money and this list grows.`);
+}
+
+const acts = {
+  'identity-no': identityNo,
+  'identity-yes': identityYes,
+  'perm-read': permRead,
+  'perm-write': permWrite,
+  tenancy,
+  money,
+  files,
+  envelope,
+};
+
+for (const button of document.querySelectorAll('[data-act]')) {
+  button.onclick = async () => {
+    button.disabled = true;
+    try {
+      await acts[button.dataset.act]();
+    } finally {
+      button.disabled = false;
+    }
+  };
+}
+
+el('clear').onclick = () => {
+  for (const pre of document.querySelectorAll('pre')) pre.textContent = '(press the button)';
+  for (const v of document.querySelectorAll('.verdict')) v.textContent = '';
+  paintEvents();
+};
+
+paintCallers();
+paintClaim();
+paintEvents();
+</script>
+</body>
+</html>
