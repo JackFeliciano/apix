@@ -40,6 +40,7 @@ These services are available to every registered module through its request cont
 | `modules/fake_shop/` | Sample commerce module. |
 | `modules/fake_ledger/` | Sample ledger reader. |
 | `modules/showroom/` | Interactive demonstration of APIX capabilities. |
+| `demo/` | The showroom page, the small server that serves it, and its test. |
 | `conformance/` | Module and connector conformance tests. |
 
 ## Getting started
