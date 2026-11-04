@@ -42,6 +42,7 @@ These services are available to every registered module through its request cont
 | `modules/showroom/` | Interactive demonstration of APIX capabilities. |
 | `demo/` | The showroom page, the small server that serves it, and its test. |
 | `conformance/` | Module and connector conformance tests. |
+| `ROADMAP.md` | The work I intend to do next, and what each item fixes. |
 
 ## Getting started
 
