@@ -1,0 +1,36 @@
+[Unit]
+Description=APIX showroom
+Documentation=https://github.com/JackFeliciano/apix
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=apix
+Group=apix
+WorkingDirectory=/var/www/apix
+EnvironmentFile=/etc/apix/showroom.env
+ExecStart=/usr/bin/node showroom/server.js
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=apix-showroom
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/apix
+RestrictAddressFamilies=AF_INET AF_INET6
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target
