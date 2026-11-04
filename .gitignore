@@ -9,3 +9,5 @@ node_modules/
 .smoke/
 *.bundle
 apix-demo-*/
+.smoke*/
+.smoke*.log
