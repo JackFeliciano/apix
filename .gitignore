@@ -13,3 +13,4 @@ apix-demo-*/
 .smoke*.log
 showroom/static/*.jpg
 showroom/static/*.jpeg
+showroom/static/
