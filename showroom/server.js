@@ -21,6 +21,7 @@ import { showroom } from '../modules/showroom/index.js';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 const pagePath = path.join(here, 'index.html');
+const homePath = path.join(here, 'home.html');
 
 const PORT = Number(process.env.APIX_PORT ?? 8091);
 const HOST = process.env.APIX_HOST ?? '127.0.0.1';
@@ -43,6 +44,7 @@ runtime.store = store;
 runtime.storeDir = path.join(DATA, 'store');
 
 const page = fs.readFileSync(pagePath);
+const home = fs.readFileSync(homePath);
 
 // Every tenant the page can look at, and the permissions the buttons ask for.
 const TENANTS = ['acme', 'globex'];
@@ -76,12 +78,24 @@ async function servePage(res) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
 
+  // The index lists what this host publishes. /apix mounts the showroom, and
+  // every route the page calls lives under that prefix so the two never mix.
   if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
+    res.writeHead(200, {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'no-store',
+      'content-length': home.length,
+    });
+    res.end(home);
+    return;
+  }
+
+  if (req.method === 'GET' && (url.pathname === '/apix' || url.pathname === '/apix/')) {
     await servePage(res);
     return;
   }
 
-  if (req.method === 'GET' && url.pathname === '/demo/events') {
+  if (req.method === 'GET' && url.pathname === '/apix/demo/events') {
     const tenant = url.searchParams.get('tenant');
     const events = tenant ? runtime.bus.events(tenant) : [];
     const body = JSON.stringify({ data: { events }, meta: { count: events.length } });
@@ -102,7 +116,16 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  runtime.handle(req, res);
+  // Everything else belongs to the runtime and lives under /apix. Strip the
+  // prefix once, here, so the router below never has to know about it.
+  if (url.pathname === '/apix' || url.pathname.startsWith('/apix/')) {
+    req.url = req.url.slice('/apix'.length) || '/';
+    runtime.handle(req, res);
+    return;
+  }
+
+  res.writeHead(404, { 'content-type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify({ error: { code: 'not_found', message: 'nothing at this path' } }));
 });
 
 server.listen(PORT, HOST, () => {

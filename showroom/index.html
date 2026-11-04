@@ -273,7 +273,8 @@ async function call(path, { method = 'GET', token = null, body = null } = {}) {
   const headers = {};
   if (token) headers.authorization = `Bearer ${token}`;
   if (body) headers['content-type'] = 'application/json';
-  const res = await fetch(path, {
+  // The page is served under /apix, and so is every route it calls.
+  const res = await fetch(`/apix${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
@@ -384,7 +385,7 @@ async function envelope() {
 }
 
 async function paintEvents() {
-  const res = await fetch(`/demo/events?tenant=${encodeURIComponent(caller)}`);
+  const res = await fetch(`/apix/demo/events?tenant=${encodeURIComponent(caller)}`);
   const data = await res.json();
   const list = el('events');
   list.innerHTML = '';
