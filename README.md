@@ -1,244 +1,288 @@
 # APIX
 
-APIX is API-X, the extended API. A plain API answers questions about the resources
-a product owns. API-X also answers who is asking, what they may do, which tenant the
-request belongs to, what the change did to an account, what should react to it, and
-which file it touched, and it answers all of that in one response shape.
+API-X (API extended) is a shared runtime for HTTP applications. It provides the infrastructure most products need: authentication, permissions, tenant isolation, transaction records, events, file storage and a consistent API response format.
 
-The runtime carries those layers. A product declares a manifest, the runtime reads
-it, and the runtime enforces what it says. Each module then gets identity,
-permissions, tenancy, a ledger, events, files and one response shape from the
-runtime, and holds no application-level dependency on its neighbours.
+Applications integrate with APIX through modules. Each module declares its routes, required permissions and published events in a manifest. The runtime loads the manifest and uses it to configure and enforce the module's access to the APIX services.
 
-The manifest is the centre of the design. It carries the module's name, its
-version, every route with the permission that route needs, and the events the
-module publishes. A route the manifest does not name never serves, and a route that
-declares no permission never joins, so the boundary is a contract the module
-signs rather than a habit its author keeps.
+Routes must be declared and assigned a permission before they can be mounted. Requests are authenticated and authorized by the runtime before reaching their handlers.
 
-These layers are ordinary. Every HTTP product needs them, and most products build
-them again, each with its own architecture, its own security assumptions and its
-own conventions.
+The repository includes two working modules: a sample shop and a ledger reader. They run on the same infrastructure without depending on each other.
 
-Two modules ship with the repository as working samples. One is a shop and one
-reads the ledger. Neither imports the other.
+## Architecture
 
-## The seven questions
+APIX provides seven shared capabilities:
 
-Every HTTP product answers the same seven questions, and most answer them again
-from nothing, each with its own architecture, its own security assumptions and its
-own conventions. API-X answers them once, below the product.
+| Layer | Responsibility |
+|---|---|
+| Identity | Authenticates requests and identifies their subjects. |
+| Permissions | Controls access to routes and operations. |
+| Tenancy | Associates requests and data with a tenant. |
+| Ledger | Records transactions and derives account balances. |
+| Events | Publishes and delivers application events. |
+| Files | Stores and retrieves tenant-associated files. |
+| Response | Standardizes successful responses and errors. |
 
-    Layer            The question it answers
-    Identity         Who is making the request?
-    Permissions      What is that identity allowed to do?
-    Tenancy          Which account or environment does the request belong to?
-    Ledger           What accountable change did this request make?
-    Events           What happened, and what should react to it?
-    Files            How does the product keep documents and other binary assets?
-    Response shape   How does the API report a result or an error, consistently?
+These services are available to every registered module through its request context.
 
-None of the seven is unusual. The cost sits in rebuilding them, and in the drift
-between one product's answer and the next.
+## Repository
 
-## What is here
+| Path | Description |
+|---|---|
+| `src/token.js` | Signed tokens using HS256. No external dependencies. |
+| `src/envelope.js` | Standard success and error responses. |
+| `src/runtime.js` | Routing, authentication, authorization, CORS and request IDs. |
+| `src/manifest.js` | Module definitions and route validation. |
+| `src/store.js` | Tenant-scoped data access. |
+| `src/ledger.js` | Double-entry postings, idempotency and account balances. |
+| `src/bus.js` | Tenant-aware event publishing and subscriptions. |
+| `src/files.js` | Content-addressed file storage, organized by tenant. |
+| `connectors/` | JSON reader and database adapter. |
+| `modules/fake_shop/` | Sample commerce module. |
+| `modules/fake_ledger/` | Sample ledger reader. |
+| `modules/showroom/` | Interactive demonstration of APIX capabilities. |
+| `conformance/` | Module and connector conformance tests. |
 
-    src/token.js        signed tokens, HS256, no dependencies
-    src/envelope.js     data + meta on success, error + meta on failure
-    src/runtime.js      routing, identity, permissions, CORS, request ids
-    src/manifest.js     defineModule: a route without a permission cannot join
-    src/store.js        every query carries a tenant, and a query without one throws
-    src/ledger.js       postings with idempotency keys, balances from the postings
-    src/bus.js          publish and subscribe, every event carries its tenant
-    src/files.js        content-addressed files, one directory per tenant
-    connectors/         the connector kit: a JSON reader and a database adapter
-    modules/fake_shop/  a sample module that sells a product and posts to the ledger
-    modules/fake_ledger/ a sample module that reads the ledger
-    conformance/run.js  the kit that proves a module honours every layer
-    conformance/connectors.js  the connector kit against one fake company
+## Getting started
 
-## Run it
+Requirements: Node.js 20 or later.
 
-Node 20 or later. There are no dependencies to install.
+No dependencies need to be installed.
 
-    node src/server.js
+```bash
+node src/server.js
+```
 
-The server prints every route it mounted, with the permission each route needs.
-It listens on port 8080 and keeps its data in `./.data`.
+The server mounts the registered routes and prints their required permissions. By default, it listens on port `8080` and stores data in `./.data`.
 
-## Mint a token, then call it
+## Authentication and requests
 
-The issuer signs tokens. A module never does.
+Tokens are issued by the APIX server. Modules do not issue or sign their own tokens.
 
-    export APIX_SECRET='a-secret-of-at-least-sixteen-characters'
-    TOKEN=$(node src/server.js token --tenant acme --perms shop.read,shop.checkout,ledger.read,ledger.write)
+```bash
+export APIX_SECRET='a-secret-of-at-least-sixteen-characters'
 
-    curl -s -H "authorization: Bearer $TOKEN" http://localhost:8080/v1/shop/products
+TOKEN=$(node src/server.js token --tenant acme --perms shop.read,shop.checkout,ledger.read,ledger.write)
+```
 
-    curl -s -X POST -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
-      -d '{"name":"Widget","price":2500}' http://localhost:8080/v1/shop/products
+List products:
 
-    curl -s -H "authorization: Bearer $TOKEN" http://localhost:8080/v1/ledger/balance/cash
+```bash
+curl -s \
+  -H "authorization: Bearer $TOKEN" \
+  http://localhost:8080/v1/shop/products
+```
 
-A call with no token returns 401 and a code. A token missing the route's
-permission returns 403. A token for another tenant sees that tenant's rows only.
+Create a product:
 
-## The response shape
+```bash
+curl -s -X POST \
+  -H "authorization: Bearer $TOKEN" \
+  -H 'content-type: application/json' \
+  -d '{"name":"Widget","price":2500}' \
+  http://localhost:8080/v1/shop/products
+```
 
-Success:
+Read an account balance:
 
-    {"data":{...},"meta":{"request_id":"req_...","at":"2026-11-03T21:16:02.363Z"}}
+```bash
+curl -s \
+  -H "authorization: Bearer $TOKEN" \
+  http://localhost:8080/v1/ledger/balance/cash
+```
 
-Failure:
+Unauthenticated requests receive `401`. Requests with insufficient permissions receive `403`. Data queries are scoped to the tenant identified by the token.
 
-    {"error":{"code":"permission_denied","message":"..."},
-     "meta":{"request_id":"req_...","at":"..."}}
+## Response format
 
-The request id rides in the `x-request-id` header as well, so a client can quote
-it and support can find the line.
+All API responses follow the same envelope.
 
-## Questions a reader asks first
+Successful response:
 
-Six questions decide whether this design holds. The answers below describe the
-code in this repository, and you can check each one in the file named.
+```json
+{
+  "data": {},
+  "meta": {
+    "request_id": "req_...",
+    "at": "2026-11-03T21:16:02.363Z"
+  }
+}
+```
 
-**How far does the manifest go?** It declares routes. Each route carries a method,
-a path, the permission it needs and a handler. It also declares the module's name,
-its version, the permission names it uses and the events it publishes. Route and
-permission are the unit of enforcement, so a module can hold many routes and
-give each one its own permission. See `src/manifest.js`.
+Error response:
 
-**Who enforces?** The runtime. It verifies the token, compares the permission the
-route declares against the claim set in the token, and only then calls the handler.
-A module author writes no check, and a handler that forgot one cannot leak, because
-the runtime never handed it the request. See `src/runtime.js`.
+```json
+{
+  "error": {
+    "code": "permission_denied",
+    "message": "..."
+  },
+  "meta": {
+    "request_id": "req_...",
+    "at": "..."
+  }
+}
+```
 
-**What does the ledger hold?** Postings, each with a debit account, a credit
-account, an integer amount in minor units, a reference and an idempotency key. To
-read a balance the ledger sums the postings for an account. The ledger refuses a
-negative or fractional amount, and it refuses a posting where debit and credit name
-the same account. Post twice with one key and the second call returns the first
-posting. See `src/ledger.js`.
+The request ID is also returned in the `x-request-id` header and can be used to correlate client requests with server logs.
 
-**How does tenancy work?** The tenant comes from the token and rides in the request
-context. Every store call takes the tenant as its second argument and throws
-without one, so a route cannot forget it. The default store keeps one JSON file per
-collection and filters on the tenant field. Isolation between databases belongs to
-the adapter you pass to `dbConnector`, so a product that needs a schema or a
-database per tenant supplies one that does that. See `src/store.js` and
-`connectors/index.js`.
+## Modules and manifests
 
-**Can someone else write a module?** Yes. A module is an object from
-`defineModule`, and the runtime takes a list of them. Nothing marks a module as
-first party. The conformance kit is the review: a module author runs it against
-their own module on their own machine, and it passes or it does not.
+A module is registered through `defineModule`. Its manifest specifies its name, version, permissions, published events and routes.
 
-**How isolated are modules?** They share one Node process and one file system. A
-handler receives the store, the ledger, the bus and the file store, and it can call
-the ones its module was given. A module that imports the runtime's internals
-directly can reach past that, so the boundary is a convention the conformance kit
-does not test. Running a module in its own process would close that gap, and this
-repository does not do it yet.
+Each route declares its HTTP method, path, required permission and handler.
 
-## A module
+Example:
 
-    import { defineModule } from '../../src/manifest.js';
-    import { ok } from '../../src/envelope.js';
+```javascript
+import { defineModule } from '../../src/manifest.js';
+import { ok } from '../../src/envelope.js';
 
-    export const mine = defineModule({
-      name: 'mine',
-      version: '0.1.0',
-      permissions: ['mine.read'],
-      events: ['mine.thing.happened'],
-      routes: [{
-        method: 'GET',
-        path: '/v1/mine/things',
-        permission: 'mine.read',
-        handler: (ctx) => ok({ things: ctx.store.list('mine_things', ctx.tenant) }),
-      }],
-    });
+export const mine = defineModule({
+  name: 'mine',
+  version: '0.1.0',
+  permissions: ['mine.read'],
+  events: ['mine.thing.happened'],
+  routes: [{
+    method: 'GET',
+    path: '/v1/mine/things',
+    permission: 'mine.read',
+    handler: (ctx) => ok({
+      things: ctx.store.list('mine_things', ctx.tenant)
+    })
+  }]
+});
+```
 
-The handler receives a context with the tenant, the subject, the claim set, the
-parsed body, the query, and the store, ledger, bus and file store. The tenant in
-the context comes from the token, never from the body. `ctx.store.list` and
-`ctx.store.get` take the tenant as their second argument and throw without it,
-so a route cannot forget it.
+The runtime validates the manifest when registering the module. Routes without a declared permission are rejected. Requests are authenticated and checked against the route's permission before the handler executes.
 
-## See it work
+Handlers receive a context containing:
 
-    npm run demo
+- `tenant`: the tenant identified by the token.
+- `subject`: the authenticated identity.
+- `claims`: the token's permission claims.
+- `body`: the parsed request body.
+- `query`: the request query parameters.
+- `store`, `ledger`, `bus` and `files`: the available APIX services.
 
-Open `http://127.0.0.1:8091/` and the page shows each layer with two buttons. One
-button makes a call the layer allows, and the other makes the call it refuses. The
-page talks to the same server process over HTTP, so every answer on screen came
-from the code in `src/`.
+The tenant is taken from the authenticated token, not from request data. Store operations require an explicit tenant argument.
 
-The demo mounts `modules/showroom/`, whose routes carry no business meaning. Each
-route exists to demonstrate one rule, and the page names the rule beside the
-answer it produced.
+## Security and isolation
 
-The demo mints the tokens on that page with a fixed secret, so they are public.
-The demo server binds to the loopback address, and its own page says so. A real
-deployment signs with a secret it holds.
+APIX enforces authentication, route permissions and tenant-scoped data access at runtime.
 
-The showroom is also covered by the suite: `conformance/showroom.js` starts the
-demo on a spare port and drives every button over real HTTP.
+The default store uses JSON files, with tenant filtering applied to collection queries. Every store operation requires a tenant context. Queries without one throw an error.
 
-## The conformance kit
+Database isolation is handled by the connector supplied to `dbConnector`. Applications requiring separate databases or schemas per tenant can implement that through their database adapter.
 
-    node conformance/run.js
-    node conformance/connectors.js
-    npm test
+Modules currently execute in the same Node.js process and share the same filesystem. The runtime provides each handler with its registered services, but this is not process-level isolation: a module that imports internal runtime components can bypass those boundaries.
 
-Both run offline against a temporary directory. They mount the sample modules on
-a real server, drive real HTTP requests at it, and check every rule: an anonymous
-call is refused, an expired token is refused, a token without the declared
-permission is refused, every answer carries a request id and the shape, a row
-written by one tenant never appears in another tenant's list, the store refuses a
-query with no tenant, a second ledger posting with the same key does not move the
-balance, an event reaches its listener with the tenant, the allowlisted origin is
-echoed and a stranger origin is not, a route with no declared permission cannot
-join, and the two connectors read the same fake company identically.
+The current conformance suite does not test protection against such direct imports. Separate-process execution would be required for stronger module isolation.
 
-A module author runs the same kit against their own module before shipping.
+## Ledger
 
-## The connector kit
+The ledger records double-entry postings. Each posting contains:
 
-A product that reads a company's data needs a way to reach the database and a way
-to read APIX-shaped files. Both connectors return rows carrying a tenant.
+- Debit and credit accounts.
+- An integer amount in minor currency units.
+- A reference.
+- An idempotency key.
 
-    import { jsonConnector, dbConnector } from './connectors/index.js';
+Account balances are calculated from the postings.
 
-    const store = jsonConnector('/srv/company/exports');
-    const { rows } = await store.fetch('acme');
+The ledger rejects negative or fractional amounts and postings where the debit and credit accounts are identical. Repeated requests with the same idempotency key return the original posting without creating another entry.
 
-    const db = dbConnector({
-      adapter: { query: (sql, params) => pool.query(sql, params) },
-      sql: 'select * from accounts where tenant = ?',
-    });
+## Events
 
-The kit carries no driver and no credentials. Your product owns the adapter and
-the settings file that holds the connection string.
+Modules can publish and subscribe to events through the shared event bus. Events carry their tenant identifier, allowing subscribers to retain tenant context when processing them.
 
-## Settings
+Published event names are declared in the module manifest.
 
-Copy `.env.example` to `.env`. Every key in it is named and empty, and the
-repository holds no key, no host and no client address. `APIX_SECRET` signs the
-tokens and needs at least 16 characters. `APIX_CORS` lists the browser origins
-allowed to call the API cross-origin, and an empty list allows nobody.
+## Files
 
-`src/server.js` falls back to a development secret so a first run works without
-configuration. Set `APIX_SECRET` before anything real touches it, and set it in
-production, because the fallback signs a token anyone can forge.
+APIX provides content-addressed file storage, organized by tenant. Modules access files through the file service rather than managing storage paths independently.
 
-## What this is not
+## Interactive demonstration
 
-APIX carries no database driver, no mail transport, no telephony provider and no
-payment processor. Those belong to the products that use them. APIX gives them a
-place to stand: an identity, a permission, a tenant, a ledger that posts once,
-events that carry the tenant, files that belong to someone, and one response
-shape a client can rely on.
+Run:
+
+```bash
+npm run demo
+```
+
+Open `http://127.0.0.1:8091/`.
+
+The showroom demonstrates the APIX layers through real HTTP requests. Each capability has an allowed operation and a corresponding operation that the runtime rejects.
+
+The demo uses a fixed, public signing secret and binds to the loopback interface. It is intended for local evaluation only.
+
+The showroom module is also covered by `conformance/showroom.js`, which starts the server on a separate port and exercises its routes over HTTP.
+
+## Conformance tests
+
+Run the test suites:
+
+```bash
+node conformance/run.js
+node conformance/connectors.js
+npm test
+```
+
+The suites run offline against temporary storage and exercise the modules through a real HTTP server.
+
+They cover:
+
+- Authentication and expired tokens.
+- Route permission enforcement.
+- Required response envelopes and request IDs.
+- Tenant-scoped data access.
+- Rejection of store queries without a tenant.
+- Ledger idempotency and balance consistency.
+- Tenant-aware event delivery.
+- CORS origin validation.
+- Manifest route validation.
+- Connector consistency across JSON and database sources.
+
+The conformance kit can also be run against independently developed modules.
+
+## Connectors
+
+APIX includes two connectors for accessing company data: a JSON reader and a database adapter.
+
+```javascript
+import { jsonConnector, dbConnector } from './connectors/index.js';
+
+const store = jsonConnector('/srv/company/exports');
+const { rows } = await store.fetch('acme');
+
+const db = dbConnector({
+  adapter: {
+    query: (sql, params) => pool.query(sql, params)
+  },
+  sql: 'select * from accounts where tenant = ?'
+});
+```
+
+Both connectors return tenant-associated rows.
+
+The connector kit does not include database drivers or connection credentials. Applications supply their own adapters and connection settings.
+
+## Configuration
+
+Copy `.env.example` to `.env`.
+
+The repository does not include deployment credentials, host addresses or client-specific configuration.
+
+- `APIX_SECRET`: Token signing secret. Must contain at least 16 characters.
+- `APIX_CORS`: Comma-separated list of browser origins allowed to access the API cross-origin. An empty list allows no origins.
+
+For convenience, `src/server.js` provides a development fallback secret. This secret is public and must never be used outside local development. Set `APIX_SECRET` explicitly before deploying APIX.
+
+## Scope
+
+APIX provides shared application infrastructure. It does not include database drivers, email or telephony services, or payment processors. These remain the responsibility of the applications integrating with it.
+
+The runtime provides the common services those applications use, while each module retains its own business logic and routes.
 
 ## Licence
 
-MIT. See LICENSE.
+MIT. See [LICENSE](LICENSE).
