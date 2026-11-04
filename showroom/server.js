@@ -90,6 +90,26 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // The portrait sits next to the page and comes back as one file. It is read
+  // from disk per request so a new photo is a copy, with no restart.
+  if (req.method === 'GET' && /^\/[a-z0-9][a-z0-9._-]*\.jpe?g$/i.test(url.pathname)) {
+    const photo = path.join(here, 'static', url.pathname.slice(1));
+    fs.readFile(photo, (err, buf) => {
+      if (err) {
+        res.writeHead(404, { 'content-type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: { code: 'not_found', message: 'nothing at this path' } }));
+        return;
+      }
+      res.writeHead(200, {
+        'content-type': 'image/jpeg',
+        'content-length': buf.length,
+        'cache-control': 'public, max-age=3600',
+      });
+      res.end(buf);
+    });
+    return;
+  }
+
   if (req.method === 'GET' && (url.pathname === '/apix' || url.pathname === '/apix/')) {
     await servePage(res);
     return;

@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jack Feliciano</title>
-<meta name="description" content="Personal projects by Jack Feliciano, who has been writing software since 1987.">
+<meta name="description" content="Jack Feliciano, software engineer. Writing code since 1987, now working in web, servers and AI training.">
+<meta property="og:title" content="Jack Feliciano">
+<meta property="og:description" content="Software engineer. Writing code since 1987.">
+<meta property="og:image" content="https://jackfeliciano.duckdns.org/jack.jpg">
 <link rel="canonical" href="https://jackfeliciano.duckdns.org/">
 <style>
   :root {
@@ -21,39 +24,45 @@
     color: var(--ink);
     font: 16px/1.62 Georgia, "Times New Roman", serif;
   }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
-  header { padding: 56px 0 26px; border-bottom: 1px solid var(--rule); }
-  h1 { margin: 0 0 10px; font-size: 30px; font-weight: normal; letter-spacing: 0.01em; }
-  .lede { margin: 0; color: var(--dim); font-size: 16px; max-width: 58ch; }
-  section { padding: 34px 0 4px; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  header { display: flex; align-items: center; gap: 26px; padding: 52px 0 26px; border-bottom: 1px solid var(--rule); }
+  header img {
+    width: 116px; height: 116px; object-fit: cover; object-position: 50% 30%;
+    border-radius: 50%; flex: 0 0 auto; filter: grayscale(6%);
+  }
+  h1 { margin: 0 0 8px; font-size: 29px; font-weight: normal; letter-spacing: 0.01em; }
+  .lede { margin: 0; color: var(--dim); font-size: 15.5px; max-width: 48ch; }
+  section { padding: 32px 0 4px; }
   h2 {
     font: 11px/1.6 "Helvetica Neue", Arial, sans-serif;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin: 0 0 14px;
-    font-weight: normal;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim);
+    margin: 0 0 14px; font-weight: normal;
   }
-  p { margin: 0 0 14px; max-width: 62ch; }
+  p { margin: 0 0 14px; max-width: 64ch; }
   .years { font-size: 15px; color: var(--dim); }
   dl { margin: 0; }
-  dt { margin: 16px 0 2px; font-size: 17px; }
+  dt { margin: 17px 0 2px; font-size: 16.5px; }
   dt span { color: var(--dim); font-size: 13px; display: block; margin-top: 2px; }
-  dd { margin: 0 0 12px; max-width: 62ch; }
-  ul { list-style: none; margin: 0; padding: 0; }
-  li { border-top: 1px solid var(--rule); padding: 16px 0 18px; }
-  li:last-child { border-bottom: 1px solid var(--rule); }
+  dd { margin: 0 0 12px; max-width: 64ch; }
+  ul.plain { list-style: none; margin: 0; padding: 0; max-width: 64ch; }
+  ul.plain li { padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  ul.plain li:last-child { border-bottom: none; }
+  ul.plain strong { font-weight: normal; }
+  ul.plain em { display: block; font-style: normal; color: var(--dim); font-size: 14px; margin-top: 2px; }
+  ul.cards { list-style: none; margin: 0; padding: 0; }
+  ul.cards li { border-top: 1px solid var(--rule); padding: 16px 0 18px; }
+  ul.cards li:last-child { border-bottom: 1px solid var(--rule); }
   a.name { color: var(--ink); text-decoration: none; font-size: 18px; border-bottom: 1px solid var(--accent); }
   a.name:hover { color: var(--accent); }
   .url { display: block; margin-top: 5px; font: 12px/1.4 "SFMono-Regular", Consolas, monospace; color: var(--dim); word-break: break-all; }
-  .what { margin: 8px 0 0; max-width: 60ch; }
+  .what { margin: 8px 0 0; max-width: 62ch; }
   .state { display: inline-block; margin-top: 8px; font: 11px/1.6 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
-  .empty { color: var(--dim); font-size: 15px; max-width: 58ch; }
-  footer { padding: 26px 0 60px; color: var(--dim); font-size: 13px; border-top: 1px solid var(--rule); margin-top: 26px; }
+  footer { padding: 26px 0 60px; color: var(--dim); font-size: 13px; border-top: 1px solid var(--rule); margin-top: 28px; }
   footer a { color: var(--dim); }
   @media (max-width: 600px) {
-    header { padding: 36px 0 20px; }
-    h1 { font-size: 25px; }
+    header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 34px 0 20px; }
+    header img { width: 88px; height: 88px; }
+    h1 { font-size: 24px; }
   }
 </style>
 </head>
@@ -61,44 +70,56 @@
 <div class="wrap">
 
 <header>
-  <h1>Jack Feliciano</h1>
-  <p class="lede">I write software. I started in 1987, and I have kept at it since.</p>
+  <img src="/jack.jpg" alt="Jack Feliciano" width="116" height="116">
+  <div>
+    <h1>Jack Feliciano</h1>
+    <p class="lede">Software engineer. I started writing code in 1987, and I have kept at it since.</p>
+  </div>
 </header>
 
 <section>
-  <h2>Computers</h2>
+  <h2>How I got here</h2>
   <p class="years">1987 to now.</p>
-  <p>My first programs were BASIC on a Brazilian clone of an Apple II. Then C, then C++ as the work grew. Everything since has been either a way of getting closer to the machine or a way of making something other people can use.</p>
-  <p>These days the work is mostly PHP, Python and JavaScript, plus whatever language a problem forces me to learn. The full list sits on my LinkedIn profile, and I keep it current.</p>
+  <p>The first programs were BASIC, on a small machine in a room in Brazil. Then C, and C++ when the projects outgrew a single file. Those years taught me what the machine actually does, which is still the part of the work I trust most.</p>
+  <p>Software engineering became the formal trade. The web became the place I practise it: HTML and CSS first, then JavaScript, then PHP and Python behind them, then SQL for whatever has to be remembered.</p>
 </section>
 
 <section>
-  <h2>Languages I have worked in</h2>
+  <h2>What I work with</h2>
   <dl>
-    <dt>BASIC <span>1987</span></dt>
-    <dd>The language you learn when the computer is a box in the corner of the room and every line you type is an event.</dd>
+    <dt>Core languages</dt>
+    <dd>BASIC, C, C++ and software engineering.</dd>
 
-    <dt>C <span>late 1980s and 1990s</span></dt>
-    <dd>Pointers, memory, and the discipline of knowing what every byte holds.</dd>
+    <dt>HTML and CSS</dt>
+    <dd>Handwritten markup and stylesheets, plus Bootstrap and Tailwind when a project wants them.</dd>
 
-    <dt>C++ <span>1990s</span></dt>
-    <dd>Objects on top of C. My first serious work with structure and reuse.</dd>
+    <dt>JavaScript</dt>
+    <dd>In the browser and in Node, with Angular and React where a project calls for one.</dd>
 
-    <dt>PHP <span>long running</span></dt>
-    <dd>The language most of the web runs on, and the one that pays for a lot of what I do.</dd>
+    <dt>PHP</dt>
+    <dd>Server-side work, templating, and the long-lived applications that keep running for years.</dd>
 
-    <dt>Python <span>long running</span></dt>
-    <dd>Scripts, data, automation, and the things that have to be finished today.</dd>
+    <dt>Python</dt>
+    <dd>Scripts, data, automation and the pieces that sit behind a larger system.</dd>
 
-    <dt>JavaScript <span>long running</span></dt>
-    <dd>In the browser and on the server.</dd>
+    <dt>SQL</dt>
+    <dd>Schemas, queries and the data that has to survive a rewrite.</dd>
+
+    <dt>Solidity</dt>
+    <dd>Contracts and the rules they hold.</dd>
+
+    <dt>Servers</dt>
+    <dd>Apache-style web servers: virtual hosts, rewrites, TLS, and the configuration that makes a site behave.</dd>
+
+    <dt>AI training</dt>
+    <dd>Writing and reviewing the material that teaches a model to do a task well, and judging where it fails.</dd>
   </dl>
 </section>
 
 <section>
   <h2>Personal projects</h2>
-  <p class="empty">This page will showcase my personal projects. One is here now. More are on the way.</p>
-  <ul>
+  <p class="what">This page will showcase my personal projects. One is here now. More are on the way.</p>
+  <ul class="cards">
     <li>
       <a class="name" href="/apix/">APIX</a>
       <span class="url">jackfeliciano.duckdns.org/apix</span>
@@ -109,7 +130,7 @@
 </section>
 
 <footer>
-  <p>Written by hand. One file, no framework. <a href="https://www.linkedin.com/in/jackfeliciano/">LinkedIn</a></p>
+  <p>Written by hand. One page, no framework. <a href="https://www.linkedin.com/in/jackfeliciano/">LinkedIn</a></p>
 </footer>
 
 </div>

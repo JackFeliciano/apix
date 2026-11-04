@@ -11,3 +11,5 @@ node_modules/
 apix-demo-*/
 .smoke*/
 .smoke*.log
+showroom/static/*.jpg
+showroom/static/*.jpeg
