@@ -20,8 +20,23 @@ import { showroom } from '../modules/showroom/index.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const pagePath = path.join(here, 'index.html');
-const homePath = path.join(here, 'home.html');
+
+// An explicit APIX_SITE wins, and a host sets it. Without it the pages load
+// from home.html next to this file, which is how the repository ships.
+const site = process.env.APIX_SITE ? path.resolve(process.env.APIX_SITE) : here;
+
+function locate(name) {
+  const p = path.join(site, name);
+  if (!fs.existsSync(p)) {
+    console.error(name + ' is missing, looked for ' + p);
+    process.exit(1);
+  }
+  return p;
+}
+
+const pagePath = locate('index.html');
+const homePath = locate('home.html');
+const photoDir = path.join(site, 'static');
 
 const PORT = Number(process.env.APIX_PORT ?? 8091);
 const HOST = process.env.APIX_HOST ?? '127.0.0.1';
@@ -90,10 +105,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // The portrait sits next to the page and comes back as one file. It is read
-  // from disk per request so a new photo is a copy, with no restart.
+  // The portrait sits in a static folder beside the index page and comes back as
+  // one file. It is read from disk per request so a new photo is a copy, with no
+  // restart.
   if (req.method === 'GET' && /^\/[a-z0-9][a-z0-9._-]*\.jpe?g$/i.test(url.pathname)) {
-    const photo = path.join(here, 'static', url.pathname.slice(1));
+    const photo = path.join(photoDir, url.pathname.slice(1));
     fs.readFile(photo, (err, buf) => {
       if (err) {
         res.writeHead(404, { 'content-type': 'application/json; charset=utf-8' });
