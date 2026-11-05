@@ -215,9 +215,11 @@ npm run demo
 
 Open `http://127.0.0.1:8091/`.
 
+A running copy of the same showroom is at https://jackfeliciano.duckdns.org/apix/, where each button mints a token and calls the module over HTTPS.
+
 The showroom demonstrates the APIX layers through real HTTP requests. Each capability has an allowed operation and a corresponding operation that the runtime rejects.
 
-The demo uses a fixed, public signing secret and binds to the loopback interface. It is intended for local evaluation only.
+The demo uses a fixed, public signing secret and binds to the loopback interface. It is intended for local evaluation only. The hosted copy runs the same demo module and serves the showroom page, and it mints a token per button at the moment a visitor clicks.
 
 The showroom module is also covered by `conformance/showroom.js`, which starts the server on a separate port and exercises its routes over HTTP.
 
