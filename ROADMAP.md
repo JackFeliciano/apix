@@ -75,12 +75,30 @@ only in this repository.
 
 ### Documentation of the envelope, separately
 
-The envelope is the part every consumer meets first and the part with the fewest words
-written about it. A page that names every error code, what causes it and what a caller
-should do next would save every future reader the same hour.
+Written down in `PROTOCOL.md` §5, which names every error code and the status that carries
+it. What remains is a caller's page: what to do next after each code, in the order a client
+meets them.
+
+### A client outside JavaScript
+
+The document exists and the suite defines compliance. The proof that this is a protocol is a
+second implementation in another language that passes `conformance/` unchanged, with no fork
+and no exception granted for it.
+
+Estimate: 6 hours.
+
+### A remote module over HTTPS
+
+`PROTOCOL.md` says version 1 delivers events only inside one process and leaves client
+credentials out. The work is a client id and a hashed secret per client, `POST /token`
+exchanging them for a short access token, and `httpConnector` in the kit returning the same
+`{ rows, source }` shape the file and database connectors return. Version 2 changes the
+document when this lands.
+
+Estimate: 8 hours.
 
 ## How an item closes
 
 An item closes when the code lands, the conformance suite grows a case that would have
 failed before, and the README still describes what the code does. I run `npm test` before
-every commit. It is 132 checks today and it moves up with each item.
+every commit. It is 34 checks today and it moves up with each item.

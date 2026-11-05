@@ -42,6 +42,7 @@ These services are available to every registered module through its request cont
 | `modules/showroom/` | Interactive demonstration of APIX capabilities. |
 | `demo/` | The showroom page, the small server that serves it, and its test. |
 | `conformance/` | Module and connector conformance tests. |
+| `PROTOCOL.md` | The wire protocol, version 1: token, manifest, envelope, tenancy, events. |
 | `ROADMAP.md` | The work I intend to do next, and what each item fixes. |
 
 ## Getting started
@@ -58,7 +59,7 @@ The server mounts the registered routes and prints their required permissions. B
 
 ## Authentication and requests
 
-Tokens are issued by the APIX server. Modules do not issue or sign their own tokens.
+The APIX server issues the tokens. Modules never sign their own.
 
 ```bash
 export APIX_SECRET='a-secret-of-at-least-sixteen-characters'
@@ -174,7 +175,8 @@ APIX enforces authentication, route permissions and tenant-scoped data access at
 
 The default store uses JSON files, with tenant filtering applied to collection queries. Every store operation requires a tenant context. Queries without one throw an error.
 
-Database isolation is handled by the connector supplied to `dbConnector`. Applications requiring separate databases or schemas per tenant can implement that through their database adapter.
+The connector you supply to `dbConnector` decides database isolation. An application that
+needs a schema or a database per tenant implements that inside its adapter.
 
 Modules currently execute in the same Node.js process and share the same filesystem. The runtime provides each handler with its registered services, but this is not process-level isolation: a module that imports internal runtime components can bypass those boundaries.
 
@@ -245,6 +247,8 @@ They cover:
 - Connector consistency across JSON and database sources.
 
 The conformance kit can also be run against independently developed modules.
+
+The rules the suite checks live in `PROTOCOL.md`, separately from the code. A client written in another language satisfies them by passing the same suite.
 
 ## Connectors
 
