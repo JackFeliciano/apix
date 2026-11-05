@@ -291,4 +291,4 @@ The runtime provides the common services those applications use, while each modu
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+Mozilla Public License 2.0. See [LICENSE](LICENSE). File-level copyleft: changes to files we ship stay open, and a product that embeds APIX keeps the rest of its own code private.

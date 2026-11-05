@@ -13,7 +13,7 @@
     "conformance": "node conformance/run.js",
     "test": "node conformance/run.js && node conformance/connectors.js && node conformance/ledger.js && node conformance/showroom.js"
   },
-  "license": "MIT",
+  "license": "MPL-2.0",
   "devDependencies": {},
   "dependencies": {}
 }
