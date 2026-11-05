@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jack Feliciano</title>
-<meta name="description" content="Jack Feliciano, software engineer. Writing code since 1987, now working in web, servers and AI training.">
+<meta name="description" content="Jack Feliciano. Programming since 1987, now working across the stack and in AI training.">
 <meta property="og:title" content="Jack Feliciano">
-<meta property="og:description" content="Software engineer. Writing code since 1987.">
+<meta property="og:description" content="A business mind, a programmer's heart.">
 <meta property="og:image" content="https://jackfeliciano.duckdns.org/jack.jpg">
 <link rel="canonical" href="https://jackfeliciano.duckdns.org/">
 <style>
@@ -30,7 +30,11 @@
     width: 116px; height: 116px; object-fit: cover; object-position: 50% 30%;
     border-radius: 50%; flex: 0 0 auto; filter: grayscale(6%);
   }
-  h1 { margin: 0 0 8px; font-size: 29px; font-weight: normal; letter-spacing: 0.01em; }
+  h1 { margin: 0 0 6px; font-size: 29px; font-weight: normal; letter-spacing: 0.01em; }
+  .motto {
+    margin: 0 0 10px; font-style: italic; font-size: 17px; color: var(--accent);
+    letter-spacing: 0.005em;
+  }
   .lede { margin: 0; color: var(--dim); font-size: 15.5px; max-width: 48ch; }
   section { padding: 32px 0 4px; }
   h2 {
@@ -38,17 +42,12 @@
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim);
     margin: 0 0 14px; font-weight: normal;
   }
-  p { margin: 0 0 14px; max-width: 64ch; }
+  p { margin: 0 0 14px; max-width: 66ch; }
   .years { font-size: 15px; color: var(--dim); }
   dl { margin: 0; }
   dt { margin: 17px 0 2px; font-size: 16.5px; }
   dt span { color: var(--dim); font-size: 13px; display: block; margin-top: 2px; }
-  dd { margin: 0 0 12px; max-width: 64ch; }
-  ul.plain { list-style: none; margin: 0; padding: 0; max-width: 64ch; }
-  ul.plain li { padding: 7px 0; border-bottom: 1px solid var(--rule); }
-  ul.plain li:last-child { border-bottom: none; }
-  ul.plain strong { font-weight: normal; }
-  ul.plain em { display: block; font-style: normal; color: var(--dim); font-size: 14px; margin-top: 2px; }
+  dd { margin: 0 0 12px; max-width: 66ch; }
   ul.cards { list-style: none; margin: 0; padding: 0; }
   ul.cards li { border-top: 1px solid var(--rule); padding: 16px 0 18px; }
   ul.cards li:last-child { border-bottom: 1px solid var(--rule); }
@@ -63,6 +62,7 @@
     header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 34px 0 20px; }
     header img { width: 88px; height: 88px; }
     h1 { font-size: 24px; }
+    .motto { font-size: 16px; }
   }
 </style>
 </head>
@@ -73,15 +73,18 @@
   <img src="/jack.jpg" alt="Jack Feliciano" width="116" height="116">
   <div>
     <h1>Jack Feliciano</h1>
-    <p class="lede">Software engineer. I started writing code in 1987, and I have kept at it since.</p>
+    <p class="motto">A business mind, a programmer's heart.</p>
+    <p class="lede">Programming since 1987.</p>
   </div>
 </header>
 
 <section>
   <h2>How I got here</h2>
-  <p class="years">1987 to now.</p>
-  <p>The first programs were BASIC, on a small machine in a room in Brazil. Then C, and C++ when the projects outgrew a single file. Those years taught me what the machine actually does, which is still the part of the work I trust most.</p>
-  <p>Software engineering became the formal trade. The web became the place I practise it: HTML and CSS first, then JavaScript, then PHP and Python behind them, then SQL for whatever has to be remembered.</p>
+  <p>I started experimenting with BASIC on a Z80-based MSX, the Sharp HotBit in Brazil, moved on to C and C++ on early x86-based PCs, and eventually into software development during the early days of the web. What began as curiosity became a lifelong technical pursuit.</p>
+  <p>Over the years I have worked with JavaScript, including React and Vue more recently, Python and SQL, covering both front-end and back-end development, as well as web server environments such as Apache and NGINX. The work has also involved application architecture, database design, API development, system integration and debugging.</p>
+  <p>I enjoy working across the stack, understanding how components interact, designing systems and turning ideas into working software. The underlying logic of computing interests me most, and I like building applications that are practical, maintainable and well structured.</p>
+  <p>Beyond conventional software development, since 2005 I have also developed systems in Social Network Analysis (SNA), drawing on cognitive architectures (DARPA's Cougaar), Bayesian networks (SeSAM) and ontologies (Stanford's Protégé), within the broader field of Mathematical Psychology.</p>
+  <p>More recently I have moved into AI and AI training, evaluating and comparing multiple large language models (LLMs), particularly DeepSeek and MiniMax, and exploring frameworks such as OpenClaw and Hermes for the development and deployment of complex autonomous and multi-agent systems.</p>
 </section>
 
 <section>
@@ -94,7 +97,7 @@
     <dd>Handwritten markup and stylesheets, plus Bootstrap and Tailwind when a project wants them.</dd>
 
     <dt>JavaScript</dt>
-    <dd>In the browser and in Node, with Angular and React where a project calls for one.</dd>
+    <dd>In the browser and in Node, with Angular, React and Vue where a project calls for one.</dd>
 
     <dt>PHP</dt>
     <dd>Server-side work, templating, and the long-lived applications that keep running for years.</dd>
@@ -109,7 +112,7 @@
     <dd>Contracts and the rules they hold.</dd>
 
     <dt>Servers</dt>
-    <dd>Apache-style web servers: virtual hosts, rewrites, TLS, and the configuration that makes a site behave.</dd>
+    <dd>Apache and NGINX: virtual hosts, rewrites, TLS, and the configuration that makes a site behave.</dd>
 
     <dt>AI training</dt>
     <dd>Writing and reviewing the material that teaches a model to do a task well, and judging where it fails.</dd>
