@@ -1,12 +1,8 @@
 # APIX
 
-API-X (API extended) is a shared runtime for HTTP applications. It provides the infrastructure most products need: authentication, permissions, tenant isolation, transaction records, events, file storage and a consistent API response format.
+APIX is a shared runtime for HTTP applications. It supplies authentication, permissions, tenant isolation, transaction records, events, file storage and a common response format. Applications connect through independent modules. Each module declares its routes, required permissions and published events in a manifest. APIX reads that manifest and controls access to its services. The runtime checks authentication and authorization before a request reaches its handler. This gives applications a common infrastructure while keeping their modules independent.
 
-Applications integrate with APIX through modules. Each module declares its routes, required permissions and published events in a manifest. The runtime loads the manifest and uses it to configure and enforce the module's access to the APIX services.
-
-Routes must be declared and assigned a permission before they can be mounted. Requests are authenticated and authorized by the runtime before reaching their handlers.
-
-The repository includes two working modules: a sample shop and a ledger reader. They run on the same infrastructure without depending on each other.
+APIX has seven layers. Identity authenticates requests and identifies their subjects. Permissions control access to routes and operations. Tenancy connects requests and data to a tenant. Ledger records transactions and derives account balances. Events publishes and delivers application events. Files stores and retrieves files for each tenant. Response defines one format for successful results and errors.
 
 ## Architecture
 
